@@ -1,0 +1,13 @@
+{
+  "name": "user-wrangling",
+  "owner": { "name": "Delkrak" },
+  "description": "Rounds up the user when Claude Code needs them: spoken and on-screen notifications.",
+  "plugins": [
+    {
+      "name": "user-wrangling",
+      "source": "./plugins/user-wrangling",
+      "description": "Text to speech and a desktop notification when Claude Code needs you or finishes a turn. Windows, Linux and macOS.",
+      "version": "0.1.0"
+    }
+  ]
+}
