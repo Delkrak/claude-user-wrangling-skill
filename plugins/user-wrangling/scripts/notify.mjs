@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-// Speaks a message and shows a desktop notification, for Claude Code's
-// Notification and Stop hooks (hook JSON on stdin) or by hand:
-//   node notify.mjs --title "Claude Code" --message "Hello"
+// Tells the user, out loud and on screen, what Claude needs them to do:
+//   node notify.mjs --project Keeper --message "Pick colour A or B for the banner"
 // CLAUDE_NOTIFY_SPEECH=0 or CLAUDE_NOTIFY_TOAST=0 turns either half off.
 
 import { spawn } from 'node:child_process';
@@ -19,28 +18,6 @@ function argument(name) {
   return at === -1 ? undefined : process.argv[at + 1];
 }
 
-async function hookInput() {
-  if (process.stdin.isTTY) return {};
-  let text = '';
-  for await (const chunk of process.stdin) text += chunk;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return {};
-  }
-}
-
-function notificationOf(input) {
-  const project = input.cwd ? basename(input.cwd) : undefined;
-  const title = argument('title') ?? (project ? `Claude Code · ${project}` : 'Claude Code');
-  const message =
-    argument('message') ??
-    (input.hook_event_name === 'Stop'
-      ? `Claude has finished${project ? ` in ${project}` : ''}.`
-      : (input.message ?? 'Claude needs your attention.'));
-  return { title, message };
-}
-
 function run(command, args, env = process.env) {
   return new Promise((resolve) => {
     const child = spawn(command, args, { env, stdio: 'ignore', windowsHide: true });
@@ -56,12 +33,12 @@ async function firstThatRuns(candidates) {
   return false;
 }
 
-function onWindows({ title, message }) {
+function onWindows({ title, message, spoken }) {
   const env = {
     ...process.env,
     CLAUDE_NOTIFY_TITLE: title,
     CLAUDE_NOTIFY_MESSAGE: message,
-    CLAUDE_NOTIFY_SPOKEN: speechOn ? message.slice(0, SPOKEN_LIMIT) : '',
+    CLAUDE_NOTIFY_SPOKEN: speechOn ? spoken : '',
     CLAUDE_NOTIFY_TOAST: toastOn ? '1' : '0',
   };
   const script = join(HERE, 'notify.ps1');
@@ -72,10 +49,9 @@ function onWindows({ title, message }) {
   );
 }
 
-async function onLinux({ title, message }) {
+async function onLinux({ title, message, spoken }) {
   if (toastOn) await run('notify-send', ['--app-name=Claude Code', title, message]);
   if (speechOn) {
-    const spoken = message.slice(0, SPOKEN_LIMIT);
     await firstThatRuns([
       ['spd-say', ['--wait', spoken]],
       ['espeak-ng', [spoken]],
@@ -84,14 +60,24 @@ async function onLinux({ title, message }) {
   }
 }
 
-async function onMac({ title, message }) {
+async function onMac({ title, message, spoken }) {
   if (toastOn) {
     const quoted = (text) => JSON.stringify(text);
     await run('osascript', ['-e', `display notification ${quoted(message)} with title ${quoted(title)}`]);
   }
-  if (speechOn) await run('say', [message.slice(0, SPOKEN_LIMIT)]);
+  if (speechOn) await run('say', [spoken]);
 }
 
-const notification = notificationOf(await hookInput());
+const message = argument('message');
+if (!message) {
+  console.error('Usage: notify.mjs --project <project> --message "<what the user needs to do>"');
+  process.exit(2);
+}
+const project = argument('project') ?? basename(process.cwd());
+const notification = {
+  title: `Claude Code · ${project}`,
+  message,
+  spoken: `${project}: ${message}`.slice(0, SPOKEN_LIMIT),
+};
 const platforms = { win32: onWindows, linux: onLinux, darwin: onMac };
 await platforms[process.platform]?.(notification);

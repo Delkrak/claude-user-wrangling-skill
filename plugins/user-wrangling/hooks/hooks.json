@@ -1,13 +1,12 @@
 {
   "hooks": {
-    "Notification": [
+    "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/notify.mjs\"",
-            "async": true,
-            "timeout": 60
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/remind.mjs\" session-start",
+            "timeout": 10
           }
         ]
       }
@@ -17,9 +16,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/notify.mjs\"",
-            "async": true,
-            "timeout": 60
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/remind.mjs\" stop",
+            "timeout": 10
           }
         ]
       }

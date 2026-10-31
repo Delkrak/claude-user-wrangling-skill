@@ -1,7 +1,7 @@
 {
   "name": "user-wrangling",
-  "version": "0.1.0",
-  "description": "Text to speech and a desktop notification when Claude Code needs you or finishes a turn. Windows, Linux and macOS.",
+  "version": "0.2.0",
+  "description": "Text to speech and a desktop notification when Claude needs you to act, naming the project and what it needs. Windows, Linux and macOS.",
   "author": { "name": "Delkrak" },
   "repository": "https://github.com/Delkrak/claude-user-wrangling-skill",
   "license": "Apache-2.0",
