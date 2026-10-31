@@ -24,7 +24,7 @@ node "<plugin>/scripts/notify.mjs" --project "<project>" --message "<required ac
 ```
 
 The notification says **project, branch and required action**: *Keeper · feat/banner: Pick banner
-colour*. The SessionStart hook gives the exact path.
+colour*. The rule that comes with each prompt gives the exact path.
 
 - `<project>` is the project's name.
 - The branch is the working directory's git branch; pass `--branch "<branch>"` when you're not in
@@ -35,7 +35,8 @@ colour*. The SessionStart hook gives the exact path.
 
 ## The hooks
 
-- **SessionStart** (also after `/clear` and compaction) gives Claude this rule and the command.
+- **UserPromptSubmit** gives Claude a short form of this rule and the command with every prompt,
+  so it reaches every session, including one running before the plugin was installed or reloaded.
 - **Stop** checks the turn: if Claude's last message hands something to the user (a question,
   "let me know", "approve", "log in"…) and it didn't notify, it asks once. Turns that only report
   or wait end without an extra round.

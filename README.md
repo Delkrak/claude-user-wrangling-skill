@@ -30,7 +30,9 @@ On Linux, install the tools if they're missing: `sudo apt install libnotify-bin 
 
 Claude decides; the hooks remind it.
 
-- **SessionStart** gives Claude the rule (notify only when the next move is yours) and the command.
+- **UserPromptSubmit** gives Claude a short rule (notify only when the next move is yours) and the
+  command with every prompt, so it reaches every session, including one that was already running
+  when the plugin was installed or reloaded.
 - **Stop** catches a forgotten one: when Claude's last message hands something to you and it
   didn't notify, it asks Claude once. Other turns end without an extra round.
 
@@ -42,6 +44,12 @@ Under `env` in `~/.claude/settings.json`:
 - `CLAUDE_NOTIFY_TOAST=0`: voice only, no notification.
 
 The `user-wrangling` skill covers testing and troubleshooting.
+
+## What changed
+
+- **0.3.0**: the rule comes with every prompt (UserPromptSubmit) instead of once at SessionStart,
+  which a session running before `/reload-plugins` never got; the Stop check recognises more
+  handovers ("is yours", "up to you").
 
 ## License
 
