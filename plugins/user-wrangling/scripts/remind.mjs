@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const NOTIFY = join(dirname(fileURLToPath(import.meta.url)), 'notify.mjs');
-const COMMAND = `node "${NOTIFY}" --project "<project>" --message "<what the user needs to do, one short sentence>"`;
+const COMMAND = `node "${NOTIFY}" --project "<project>" --message "<required action, a few words>"`;
 
 const RULE = `## Notifying the user (user-wrangling plugin)
 
@@ -23,8 +23,10 @@ they can do, tell them before ending your turn by running:
   a background task or a scheduled wake-up (wait and check yourself); the work is done and you're
   only reporting it; a progress update; something they may look at but needn't.
 - The test: if the user ignores this, does the work stay stuck? Only a yes earns a notification.
-- <project> is the project's name. The message says what to do, not what happened:
-  "Pick colour A or B for the banner", not "Finished the banner".`;
+- The notification says the project, the branch and the required action. <project> is the
+  project's name; the branch is read from git (add --branch "<branch>" if you're not in the repo).
+- The message is the required action in a few words (3-8), not what happened:
+  "Pick banner colour", "Approve the migration", "Log in to gcloud"; not "Finished the banner".`;
 
 const REMINDER = `Your last message seems to hand something to the user, and you haven't notified them. If the work is stuck until they act (answer, decide, approve, log in, test by hand), notify them now: ${COMMAND}
 If you're only waiting on a pipeline, build or background task, or nothing is needed from them, don't notify, and end your turn with no further text.`;

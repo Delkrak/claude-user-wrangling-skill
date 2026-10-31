@@ -3,9 +3,9 @@
 Claude rounds *you* up for a change. A Claude Code plugin marketplace containing the
 `user-wrangling` plugin: when the work is stuck until you do something (answer a question, make a
 decision, approve, log in, test by hand), Claude says so out loud and shows a desktop
-notification, naming the project and what it needs:
+notification with the project, the branch and the required action in a few words:
 
-> **Claude Code · Keeper** — Pick colour A or B for the banner
+> **Keeper · feat/banner** — Pick banner colour
 
 It stays quiet otherwise: no "I'm done", no progress updates, and nothing while Claude is only
 waiting on a pipeline, a build or a background task.

@@ -20,12 +20,18 @@ The test: **if the user ignores this, does the work stay stuck?** Only a yes ear
 ## How
 
 ```sh
-node "<plugin>/scripts/notify.mjs" --project "<project>" --message "<what they need to do>"
+node "<plugin>/scripts/notify.mjs" --project "<project>" --message "<required action, a few words>"
 ```
 
-The SessionStart hook gives the exact path. `<project>` is the project's name; the message is one
-short sentence saying what to do, not what happened ("Pick colour A or B for the banner", not
-"Finished the banner"). One notification per thing you need.
+The notification says **project, branch and required action**: *Keeper · feat/banner: Pick banner
+colour*. The SessionStart hook gives the exact path.
+
+- `<project>` is the project's name.
+- The branch is the working directory's git branch; pass `--branch "<branch>"` when you're not in
+  the repo. It's left out when there is none.
+- The message is the required action in a few words (3–8), not what happened: "Pick banner
+  colour", "Approve the migration", "Log in to gcloud"; not "Finished the banner".
+- One notification per thing you need.
 
 ## The hooks
 

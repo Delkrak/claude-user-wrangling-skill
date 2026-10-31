@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-// Tells the user, out loud and on screen, what Claude needs them to do:
-//   node notify.mjs --project Keeper --message "Pick colour A or B for the banner"
+// Tells the user, out loud and on screen, the project, the branch and what Claude needs them to do:
+//   node notify.mjs --project Keeper --message "Pick banner colour"
+// The branch is the working directory's git branch unless --branch names one.
 // CLAUDE_NOTIFY_SPEECH=0 or CLAUDE_NOTIFY_TOAST=0 turns either half off.
 
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,6 +17,24 @@ const toastOn = process.env.CLAUDE_NOTIFY_TOAST !== '0';
 function argument(name) {
   const at = process.argv.indexOf(`--${name}`);
   return at === -1 ? undefined : process.argv[at + 1];
+}
+
+function currentBranch() {
+  try {
+    const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      windowsHide: true,
+    }).trim();
+    return branch && branch !== 'HEAD' ? branch : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+// "feat/notify-when-needed" reads aloud as "feat notify when needed", not "feat slash notify…".
+function spokenBranch(branch) {
+  return branch.replace(/[/_-]+/g, ' ');
 }
 
 function run(command, args, env = process.env) {
@@ -70,14 +89,18 @@ async function onMac({ title, message, spoken }) {
 
 const message = argument('message');
 if (!message) {
-  console.error('Usage: notify.mjs --project <project> --message "<what the user needs to do>"');
+  console.error('Usage: notify.mjs --project <project> [--branch <branch>] --message "<required action>"');
   process.exit(2);
 }
 const project = argument('project') ?? basename(process.cwd());
+const branch = argument('branch') ?? currentBranch();
 const notification = {
-  title: `Claude Code · ${project}`,
+  title: branch ? `${project} · ${branch}` : project,
   message,
-  spoken: `${project}: ${message}`.slice(0, SPOKEN_LIMIT),
+  spoken: (branch ? `${project}, ${spokenBranch(branch)}: ${message}` : `${project}: ${message}`).slice(
+    0,
+    SPOKEN_LIMIT,
+  ),
 };
 const platforms = { win32: onWindows, linux: onLinux, darwin: onMac };
 await platforms[process.platform]?.(notification);
