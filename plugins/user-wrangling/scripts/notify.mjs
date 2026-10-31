@@ -32,9 +32,39 @@ function currentBranch() {
   }
 }
 
-// "feat/notify-when-needed" reads aloud as "feat notify when needed", not "feat slash notify…".
+const BRANCH_KINDS = {
+  feat: 'feature',
+  feature: 'feature',
+  fix: 'fix',
+  bugfix: 'fix',
+  hotfix: 'hotfix',
+  docs: 'docs',
+  doc: 'docs',
+  chore: 'chore',
+  refactor: 'refactor',
+  test: 'tests',
+  tests: 'tests',
+  perf: 'performance',
+  ci: 'CI',
+  build: 'build',
+  release: 'release',
+  style: 'style',
+};
+const MAIN_BRANCHES = new Set(['main', 'master', 'develop', 'trunk']);
+
+// How a person would say a branch: "feat/notify-when-needed" → "notify when needed feature",
+// "fix/KEE-12-login-page" → "KEE 12 login page fix", "main" → "main branch".
 function spokenBranch(branch) {
-  return branch.replace(/[/_-]+/g, ' ');
+  if (MAIN_BRANCHES.has(branch)) return `${branch} branch`;
+  const [first, ...rest] = branch.split('/');
+  const kind = rest.length > 0 ? BRANCH_KINDS[first.toLowerCase()] : undefined;
+  const words = (kind ? rest : [first, ...rest])
+    .join(' ')
+    .replace(/[-_]+|(?<!\d)\.|\.(?!\d)/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (kind === 'release') return `release ${words}`;
+  return kind ? `${words} ${kind}` : words;
 }
 
 function run(command, args, env = process.env) {
