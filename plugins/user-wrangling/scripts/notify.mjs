@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 // Tells the user, out loud and on screen, the project, the branch and what Claude needs them to do:
-//   node notify.mjs --project Keeper --message "Pick banner colour"
+//   node notify.mjs --project Keeper --message "Pick banner colour" --delay 20
 // The branch is the working directory's git branch unless --branch names one.
+// --delay <seconds> returns at once and notifies that much later, when Claude's message is ready.
 // CLAUDE_NOTIFY_SPEECH=0 or CLAUDE_NOTIFY_TOAST=0 turns either half off.
 
 import { execFileSync, spawn } from 'node:child_process';
 import { basename, dirname, join } from 'node:path';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SPOKEN_LIMIT = 200;
+const MAX_DELAY_SECONDS = 120;
 
 const speechOn = process.env.CLAUDE_NOTIFY_SPEECH !== '0';
 const toastOn = process.env.CLAUDE_NOTIFY_TOAST !== '0';
@@ -119,8 +122,27 @@ async function onMac({ title, message, spoken }) {
 
 const message = argument('message');
 if (!message) {
-  console.error('Usage: notify.mjs --project <project> [--branch <branch>] --message "<required action>"');
+  console.error(
+    'Usage: notify.mjs --project <project> [--branch <branch>] [--delay <seconds>] --message "<required action>"',
+  );
   process.exit(2);
+}
+
+// The waiting copy runs detached, so Claude's command returns and it can write its message meanwhile.
+const waiting = Number(process.env.CLAUDE_NOTIFY_WAIT);
+if (waiting > 0) {
+  await sleep(waiting * 1000);
+} else {
+  const delay = Math.min(Math.max(Number(argument('delay')) || 0, 0), MAX_DELAY_SECONDS);
+  if (delay > 0) {
+    spawn(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+      env: { ...process.env, CLAUDE_NOTIFY_WAIT: String(delay) },
+    }).unref();
+    process.exit(0);
+  }
 }
 const project = argument('project') ?? basename(process.cwd());
 const branch = argument('branch') ?? currentBranch();

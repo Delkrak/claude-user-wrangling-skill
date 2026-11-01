@@ -12,10 +12,11 @@ const NOTIFY = join(dirname(fileURLToPath(import.meta.url)), 'notify.mjs');
 const COMMAND = `node "${NOTIFY}" --project "<project>" --message "<required action, 3-8 words>"`;
 
 const RULE = `user-wrangling: before you write a final message that leaves the user something to do (answer, decide, approve, log in, test by hand), first run this, then write the message:
-${COMMAND}
+${COMMAND} --delay <seconds>
+--delay is your estimate of how long until that message or question is on screen, so the call reaches the user when it's ready: about 5 for a line or two, 10 before a question you'll ask with a tool, 15-30 for a long report. The command returns at once.
 Not when you're waiting on CI, a build or a background task, for finished work, or for progress. The test: if the user ignores it, does the work stay stuck?`;
 
-const REMINDER = `Your last message seems to hand something to the user, and you haven't notified them. If the work is stuck until they act (answer, decide, approve, log in, test by hand), notify them now: ${COMMAND}
+const REMINDER = `Your last message seems to hand something to the user, and you haven't notified them. If the work is stuck until they act (answer, decide, approve, log in, test by hand), notify them now (no --delay: your message is already on screen): ${COMMAND}
 Either way, end your turn with no further text: your previous message stands. If you're only waiting on a pipeline, build or background task, or nothing is needed from them, don't notify.`;
 
 // Words that hand the next move to the user. A miss only costs the reminder; the rule still applies.

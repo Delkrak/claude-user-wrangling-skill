@@ -20,8 +20,15 @@ The test: **if the user ignores this, does the work stay stuck?** Only a yes ear
 ## How
 
 ```sh
-node "<plugin>/scripts/notify.mjs" --project "<project>" --message "<required action, a few words>"
+node "<plugin>/scripts/notify.mjs" --project "<project>" --message "<required action, a few words>" --delay <seconds>
 ```
+
+Run it **before** writing the message, with `--delay` set to your estimate of how long until
+that message or question is on screen: about 5 for a line or two, 10 before a question asked
+with a tool, 15–30 for a long report (capped at 120). The command returns at once and the call
+arrives when the message is ready, so the user doesn't come back to a half-written answer.
+Without `--delay` it notifies straight away (as after a Stop reminder, when the message is
+already shown).
 
 The notification says **project, branch and required action**: *Keeper · feat/banner: Pick banner
 colour*. The rule that comes with each prompt gives the exact path.

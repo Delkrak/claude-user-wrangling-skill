@@ -10,6 +10,9 @@ notification with the project, the branch and the required action in a few words
 It stays quiet otherwise: no "I'm done", no progress updates, and nothing while Claude is only
 waiting on a pipeline, a build or a background task.
 
+The call is timed: Claude estimates how long its message or question will take to appear and
+the notification arrives then (`--delay`), so you don't come back to a half-written answer.
+
 | Platform | Notification | Speech |
 |---|---|---|
 | Windows | toast (no modules to install) | built-in SAPI voices |
@@ -49,7 +52,8 @@ The `user-wrangling` skill covers testing and troubleshooting.
 
 - **0.3.0**: the rule comes with every prompt (UserPromptSubmit) instead of once at SessionStart,
   which a session running before `/reload-plugins` never got; the Stop check recognises more
-  handovers ("is yours", "up to you").
+  handovers ("is yours", "up to you"); `--delay` times the call to when Claude's message is on
+  screen.
 
 ## License
 
