@@ -7,7 +7,7 @@
       "name": "user-wrangling",
       "source": "./plugins/user-wrangling",
       "description": "Text to speech and a desktop notification when Claude needs you to act, naming the project and what it needs. Windows, Linux and macOS.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }

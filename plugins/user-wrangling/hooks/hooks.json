@@ -1,11 +1,11 @@
 {
   "hooks": {
-    "SessionStart": [
+    "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/remind.mjs\" session-start",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/remind.mjs\" prompt",
             "timeout": 10
           }
         ]

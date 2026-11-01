@@ -10,6 +10,9 @@ notification with the project, the branch and the required action in a few words
 It stays quiet otherwise: no "I'm done", no progress updates, and nothing while Claude is only
 waiting on a pipeline, a build or a background task.
 
+The call is timed: Claude estimates how long its message or question will take to appear and
+the notification arrives then (`--delay`), so you don't come back to a half-written answer.
+
 | Platform | Notification | Speech |
 |---|---|---|
 | Windows | toast (no modules to install) | built-in SAPI voices |
@@ -30,7 +33,9 @@ On Linux, install the tools if they're missing: `sudo apt install libnotify-bin 
 
 Claude decides; the hooks remind it.
 
-- **SessionStart** gives Claude the rule (notify only when the next move is yours) and the command.
+- **UserPromptSubmit** gives Claude a short rule (notify only when the next move is yours) and the
+  command with every prompt, so it reaches every session, including one that was already running
+  when the plugin was installed or reloaded.
 - **Stop** catches a forgotten one: when Claude's last message hands something to you and it
   didn't notify, it asks Claude once. Other turns end without an extra round.
 
@@ -42,6 +47,13 @@ Under `env` in `~/.claude/settings.json`:
 - `CLAUDE_NOTIFY_TOAST=0`: voice only, no notification.
 
 The `user-wrangling` skill covers testing and troubleshooting.
+
+## What changed
+
+- **0.3.0**: the rule comes with every prompt (UserPromptSubmit) instead of once at SessionStart,
+  which a session running before `/reload-plugins` never got; the Stop check recognises more
+  handovers ("is yours", "up to you"); `--delay` times the call to when Claude's message is on
+  screen.
 
 ## License
 
